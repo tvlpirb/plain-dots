@@ -18,6 +18,15 @@ parser.add_argument("-d","--dir",help="Path to directory containing themes")
 parser.add_argument("-t","--theme",help="Name of theme")
 args = parser.parse_args()
 
+
+def deleteFile(path):
+    if os.islink(path):
+        os.unlink(path)
+    elif os.path.isfile(path):
+        os.remove(path)
+    else:
+        shutil.rmtree(path)
+
 # Setting up variables
 if args.dir != None:
     theme_dir = args.dir
@@ -54,18 +63,17 @@ else:
     user_path = os.path.expanduser("~/.config/")
     cwd = os.getcwd() + "/"
     for item in os.listdir():
+        fromPath = cwd + item
+        toPath = user_path + item
         try:
-            os.symlink(cwd + item,user_path + item)
+            os.symlink(fromPath,toPath)
         except FileExistsError:
             print(f"There is already a configuration for {item}")
             user_input = ""
             while user_input not in ["y","n","Y","N"]:
                 user_input = input("Do you want to delete current config? (y/n) ")
             if user_input.lower() == "y":
-                if os.path.isfile(user_path + item):
-                    os.remove(user_path + item)
-                else:
-                    shutil.rmtree(user_path + item)
+                deleteFile(toPath)
                 os.symlink(cwd + item,user_path + item)
             else:
                 print(f"Skipping config for {item}")
