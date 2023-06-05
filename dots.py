@@ -20,7 +20,7 @@ args = parser.parse_args()
 
 
 def deleteFile(path):
-    if os.islink(path):
+    if os.path.islink(path):
         os.unlink(path)
     elif os.path.isfile(path):
         os.remove(path)
