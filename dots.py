@@ -62,6 +62,8 @@ else:
     os.chdir(theme)
     user_path = os.path.expanduser("~/.config/")
     cwd = os.getcwd() + "/"
+    skipall = False
+    user_input = ""
     for item in os.listdir():
         fromPath = cwd + item
         toPath = user_path + item
@@ -69,10 +71,12 @@ else:
             os.symlink(fromPath,toPath)
         except FileExistsError:
             print(f"There is already a configuration for {item}")
-            user_input = ""
-            while user_input not in ["y","n","Y","N"]:
-                user_input = input("Do you want to delete current config? (y/n) ")
-            if user_input.lower() == "y":
+            if not skipall:
+                while user_input not in ["y","n","Y","N","all"]:
+                    user_input = input("Do you want to delete current config? (y/n/all) ")
+                    if user_input == "all":
+                        skipall = True
+            if skipall or user_input.lower() == "y":
                 deleteFile(toPath)
                 os.symlink(cwd + item,user_path + item)
             else:
